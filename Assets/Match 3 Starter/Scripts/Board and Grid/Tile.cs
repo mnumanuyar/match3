@@ -61,8 +61,13 @@ public class Tile : MonoBehaviour {
 			if (previousSelected == null) { // Is it the first tile selected?
 				Select();
 			} else {
-				SwapSprite(previousSelected.render);
-				previousSelected.Deselect(); 
+				if (GetAllAdjacentTiles().Contains(previousSelected.gameObject)) { // 1
+					SwapSprite(previousSelected.render); // 2
+					previousSelected.Deselect();
+				} else { // 3
+					previousSelected.GetComponent<Tile>().Deselect();
+					Select();
+				}
 			}
 		}
 	}
@@ -76,5 +81,21 @@ public class Tile : MonoBehaviour {
 		render2.sprite = render.sprite; // 4
 		render.sprite = tempSprite; // 5
 		SFXManager.instance.PlaySFX(Clip.Swap); // 6
+	}
+
+	private GameObject GetAdjacent(Vector2 castDir) {
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, castDir);
+		if (hit.collider != null) {
+			return hit.collider.gameObject;
+		}
+		return null;
+	}
+
+	private List<GameObject> GetAllAdjacentTiles() {
+		List<GameObject> adjacentTiles = new List<GameObject>();
+		for (int i = 0; i < adjacentDirections.Length; i++) {
+			adjacentTiles.Add(GetAdjacent(adjacentDirections[i]));
+		}
+		return adjacentTiles;
 	}
 }
