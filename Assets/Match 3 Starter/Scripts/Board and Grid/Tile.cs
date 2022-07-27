@@ -51,18 +51,30 @@ public class Tile : MonoBehaviour {
 	}
 
 	void OnMouseDown() { 
-    if (render.sprite == null || BoardManager.instance.IsShifting) {
-        return;
-    }
+		if (render.sprite == null || BoardManager.instance.IsShifting) {
+			return;
+		}
 
-    if (isSelected) { // Is it already selected?
-        Deselect();
-    } else {
-        if (previousSelected == null) { // Is it the first tile selected?
-            Select();
-        } else {
-            previousSelected.Deselect(); 
-        }
-    }
-}
+		if (isSelected) { // Is it already selected?
+			Deselect();
+		} else {
+			if (previousSelected == null) { // Is it the first tile selected?
+				Select();
+			} else {
+				SwapSprite(previousSelected.render);
+				previousSelected.Deselect(); 
+			}
+		}
+	}
+
+	public void SwapSprite(SpriteRenderer render2) { // 1
+		if (render.sprite == render2.sprite) { // 2
+			return;
+		}
+
+		Sprite tempSprite = render2.sprite; // 3
+		render2.sprite = render.sprite; // 4
+		render.sprite = tempSprite; // 5
+		SFXManager.instance.PlaySFX(Clip.Swap); // 6
+	}
 }
